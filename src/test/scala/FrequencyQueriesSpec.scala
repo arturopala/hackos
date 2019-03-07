@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-import FrequencyQueries.{freqQuery,parse}
+import java.io.{BufferedReader, StringReader}
+
+import FrequencyQueries.freqQuery
 import org.scalatest.{FlatSpec, Matchers}
 
 class FrequencyQueriesSpec extends FlatSpec with Matchers {
@@ -23,37 +25,43 @@ class FrequencyQueriesSpec extends FlatSpec with Matchers {
 
     freqQuery(Array(Array(1, 1), Array(2, 1), Array(3, 1))) should contain.theSameElementsAs(Array(0))
 
-    freqQuery(parse(
-      """8
-        |1 5
-        |1 6
-        |3 2
-        |1 10
-        |1 10
-        |1 6
-        |2 5
-        |3 2""".stripMargin)) should contain.theSameElementsAs(Array(0,1))
+    freqQuery(parse("""8
+                      |1 5
+                      |1 6
+                      |3 2
+                      |1 10
+                      |1 10
+                      |1 6
+                      |2 5
+                      |3 2""".stripMargin)) should contain.theSameElementsAs(Array(0, 1))
 
-    freqQuery(parse(
-      """4
-        |3 4
-        |2 1003
-        |1 16
-        |3 1""".stripMargin)) should contain.theSameElementsAs(Array(0,1))
+    freqQuery(parse("""4
+                      |3 4
+                      |2 1003
+                      |1 16
+                      |3 1""".stripMargin)) should contain.theSameElementsAs(Array(0, 1))
 
-    freqQuery(parse(
-      """10
-        |1 3
-        |2 3
-        |3 2
-        |1 4
-        |1 5
-        |1 5
-        |1 4
-        |3 2
-        |2 4
-        |3 2""".stripMargin)) should contain.theSameElementsAs(Array(0,1,1))
+    freqQuery(parse("""10
+                      |1 3
+                      |2 3
+                      |3 2
+                      |1 4
+                      |1 5
+                      |1 5
+                      |1 4
+                      |3 2
+                      |2 4
+                      |3 2""".stripMargin)) should contain.theSameElementsAs(Array(0, 1, 1))
   }
 
+  def parse(input: String): Array[Array[Int]] = {
+    val stream = new BufferedReader(new StringReader(input))
+    val q = stream.readLine.trim.toInt
+    val queries = Array.ofDim[Int](q, 2)
+    for (i <- 0 until q) {
+      queries(i) = stream.readLine.replaceAll("\\s+$", "").split(" ").map(_.trim.toInt)
+    }
+    queries
+  }
 
 }

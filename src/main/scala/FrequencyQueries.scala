@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import java.io.{BufferedReader, StringReader}
-
 /**
   * You are given queries.
   *
@@ -61,16 +59,6 @@ object FrequencyQueries {
     })
 
     result.reverse.toArray[Int]
-  }
-
-  def parse(input: String):Array[Array[Int]] = {
-    val stream = new BufferedReader(new StringReader(input))
-    val q = stream.readLine.trim.toInt
-    val queries = Array.ofDim[Int](q, 2)
-    for (i <- 0 until q) {
-      queries(i) = stream.readLine.replaceAll("\\s+$", "").split(" ").map(_.trim.toInt)
-    }
-    queries
   }
 
 }
