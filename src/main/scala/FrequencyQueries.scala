@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-/**
-  * You are given queries.
-  *
-  * Each query is of the form two integers described below:
-  * - 1 x: Insert x in your data structure.
-  * - 2 y: Delete one occurrence of y from your data structure, if present.
-  * - 3 z: Check if any integer is present whose frequency is exactly z. If yes, print 1 else 0.
-  *
-  * Return an integer array consisting of all the outputs of queries of type 3.
-  */
 object FrequencyQueries {
 
+  /**
+    * You are given queries.
+    *
+    * Each query is of the form two integers described below:
+    * - 1 x: Insert x in your data structure.
+    * - 2 y: Delete one occurrence of y from your data structure, if present.
+    * - 3 z: Check if any integer is present whose frequency is exactly z. If yes, print 1 else 0.
+    *
+    * Return an integer array consisting of all the outputs of queries of type 3.
+    */
   def freqQuery(queries: Array[Array[Int]]): Array[Int] = {
 
     val counts = scala.collection.mutable.Map[Int, Int]()

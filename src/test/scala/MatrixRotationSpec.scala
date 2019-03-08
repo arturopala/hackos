@@ -19,7 +19,7 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class MatrixRotationSpec extends FlatSpec with Matchers {
 
-  it should "rotate the matrix given number times" in {
+  it should "rotate the matrix anti-clockwise given number times" in {
     matrixRotation(
       matrix("""
                | 1  2  3  4
@@ -210,6 +210,47 @@ class MatrixRotationSpec extends FlatSpec with Matchers {
 
     val empty = Array.ofDim[Array[Int]](0)
     matrixRotation(empty, 100) shouldBe empty
+  }
+
+  "Rotate function" should "rotate the matrix anti-clockwise" in {
+    val rotation = MatrixRotation.Rotate(4, 5)
+    val m1 = matrix("""
+                      | 1  2  3  4  5
+                      | 6  7  8  9 10
+                      |11 12 13 14 15
+                      |16 17 18 19 20
+                       """.stripMargin)
+    val m2 = matrix("""
+                      |3  4  5 10 15
+                      |2  9 14 13 20
+                      |1  8  7 12 19
+                      |6 11 16 17 18
+             """.stripMargin)
+    rotation(2)(m1) shouldBe m2
+    m2 should not be theSameInstanceAs(m1)
+  }
+
+  "Rotate function" should "rotate the matrix clockwise" in {
+    val rotation = MatrixRotation.Rotate(4, 5)
+    rotation(2, clockwise = true)(matrix("""
+                                           | 1  2  3  4  5
+                                           | 6  7  8  9 10
+                                           |11 12 13 14 15
+                                           |16 17 18 19 20
+                                         """.stripMargin)) shouldBe
+      matrix("""
+               |11  6  1  2  3
+               |16 13 12  7  4
+               |17 14  9  8  5
+               |18 19 20 15 10
+             """.stripMargin)
+  }
+
+  "Rotate function" should "throw an exception when shape not match" in {
+    val rotation = MatrixRotation.Rotate(4, 5)
+    an[Exception] shouldBe thrownBy(rotation(1)(matrix(5, 4)))
+    an[Exception] shouldBe thrownBy(rotation(1)(matrix(4, 4)))
+    an[Exception] shouldBe thrownBy(rotation(1)(matrix(5, 5)))
   }
 
   def matrix(s: String): Array[Array[Int]] = {
