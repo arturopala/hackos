@@ -230,20 +230,58 @@ class MatrixRotationSpec extends FlatSpec with Matchers {
     m2 should not be theSameInstanceAs(m1)
   }
 
+  "Rotate function" should "rotate the matrix anti-clockwise in place (mutate)" in {
+    val rotation = MatrixRotation.Rotate(4, 5)
+    val m1 = matrix("""
+                      | 1  2  3  4  5
+                      | 6  7  8  9 10
+                      |11 12 13 14 15
+                      |16 17 18 19 20
+                    """.stripMargin)
+    val m2 = rotation(2, mutate = true)(m1)
+    m2 shouldBe matrix("""
+                         |3  4  5 10 15
+                         |2  9 14 13 20
+                         |1  8  7 12 19
+                         |6 11 16 17 18
+                       """.stripMargin)
+    m2 shouldBe theSameInstanceAs(m1)
+  }
+
   "Rotate function" should "rotate the matrix clockwise" in {
     val rotation = MatrixRotation.Rotate(4, 5)
-    rotation(2, clockwise = true)(matrix("""
-                                           | 1  2  3  4  5
-                                           | 6  7  8  9 10
-                                           |11 12 13 14 15
-                                           |16 17 18 19 20
-                                         """.stripMargin)) shouldBe
-      matrix("""
-               |11  6  1  2  3
-               |16 13 12  7  4
-               |17 14  9  8  5
-               |18 19 20 15 10
+    val m1 = matrix("""
+                      | 1  2  3  4  5
+                      | 6  7  8  9 10
+                      |11 12 13 14 15
+                      |16 17 18 19 20
+                    """.stripMargin)
+    val m2 = rotation(-2)(m1)
+    m2 shouldBe matrix("""
+                         |11  6  1  2  3
+                         |16 13 12  7  4
+                         |17 14  9  8  5
+                         |18 19 20 15 10
+                       """.stripMargin)
+    m2 should not be theSameInstanceAs(m1)
+  }
+
+  "Rotate function" should "rotate the matrix clockwise in place (mutate)" in {
+    val rotation = MatrixRotation.Rotate(4, 5)
+    val m1 = matrix("""
+                      | 1  2  3  4  5
+                      | 6  7  8  9 10
+                      |11 12 13 14 15
+                      |16 17 18 19 20
+                    """.stripMargin)
+    val m2 = rotation(-2, mutate = true)(m1)
+    m2 shouldBe matrix("""
+                         |11  6  1  2  3
+                         |16 13 12  7  4
+                         |17 14  9  8  5
+                         |18 19 20 15 10
              """.stripMargin)
+    m2 shouldBe theSameInstanceAs(m1)
   }
 
   "Rotate function" should "throw an exception when shape not match" in {
@@ -251,6 +289,13 @@ class MatrixRotationSpec extends FlatSpec with Matchers {
     an[Exception] shouldBe thrownBy(rotation(1)(matrix(5, 4)))
     an[Exception] shouldBe thrownBy(rotation(1)(matrix(4, 4)))
     an[Exception] shouldBe thrownBy(rotation(1)(matrix(5, 5)))
+  }
+
+  "Rotate function" should "rotate the large matrix" in {
+    val rotation = MatrixRotation.Rotate(100, 100)
+    val m1 = matrix(100, 100)
+    val m2 = rotation(37, mutate = true)(m1)
+    m1.map(_.sum).sum shouldBe m2.map(_.sum).sum
   }
 
   def matrix(s: String): Array[Array[Int]] = {

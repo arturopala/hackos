@@ -19,7 +19,7 @@ object MatrixRotation {
   /**
     * You are given a 2D matrix of dimension  and a positive integer.
     * You have to rotate the matrix r times and print the resultant matrix.
-    * Rotation should be in anti-clockwise direction.
+    * Rotation should be in anti-clockwise direction if positive, otherwise clockwise.
     * It is NOT guaranteed that the minimum of m and n will be even.
     *
     * Example:
@@ -38,28 +38,29 @@ object MatrixRotation {
       val rows = matrix.length
       val cols = matrix(0).length
       val rotate = Rotate(rows, cols)
+      // rotate
       rotate(r)(matrix)
     }
+
+  type MatrixTransformation = Array[Array[Int]] => Array[Array[Int]]
 
   /** Function to rotate matrix of the given shape  in the linear time */
   case class Rotate(rows: Int, cols: Int) {
     // compute rings lengths and initialize transformation table
     val numberOfRings =
       if (Math.min(rows, cols) % 2 == 0) Math.min(rows, cols) / 2 else (Math.min(rows, cols) + 1) / 2
-    val rings = Array.ofDim[Int](numberOfRings)
-    val transformation = Array.ofDim[Array[(Int, Int)]](numberOfRings)
+    val rings = Array.ofDim[Array[(Int, Int)]](numberOfRings)
     for (ringIndex <- 0 until numberOfRings) {
       val mr = rows - 2 * ringIndex
       val nr = cols - 2 * ringIndex
       val ringLength = if (mr == 1) nr else if (nr == 1) mr else 2 * mr + 2 * nr - 4
-      rings(ringIndex) = ringLength
-      transformation(ringIndex) = Array.ofDim[(Int, Int)](ringLength)
+      rings(ringIndex) = Array.ofDim[(Int, Int)](ringLength)
     }
     // compute transformation table
     for (rowIndex <- 0 until rows; colIndex <- 0 until cols) {
       // compute ringIndex and index
       val ringIndex = scala.collection.Seq(rowIndex, colIndex, rows - rowIndex - 1, cols - colIndex - 1).min
-      val ringLength = rings(ringIndex)
+      val ringLength = rings(ringIndex).length
       val lm = rows - 2 * ringIndex
       val ln = cols - 2 * ringIndex
       val li = rowIndex - ringIndex
@@ -70,30 +71,39 @@ object MatrixRotation {
         else if (li == lm - 1) lm + lj - 1
         else ringLength - ln - li + 1
       // remember matrix location for the ring position
-      transformation(ringIndex)(position) = (rowIndex, colIndex)
+      rings(ringIndex)(ringLength - position - 1) = (rowIndex, colIndex)
     }
 
-    def apply(steps: Int, clockwise: Boolean = false)(matrix: Array[Array[Int]]): Array[Array[Int]] = {
+    def apply(steps: Int, mutate: Boolean = false): MatrixTransformation = { matrix =>
       require(
         matrix.length == rows && matrix(0).length == cols,
         s"Matrix to rotate must have the expected shape $rows x $cols but was ${matrix.length} x ${matrix(0).length}"
       )
-      val result = Array.ofDim[Int](rows, cols)
-      // rotate matrix
-      for (ringIndex <- 0 until numberOfRings) {
-        val ringLength = rings(ringIndex)
-        val offset = steps % ringLength
-        for (position <- 0 until ringLength) {
-          val (r1, c1) = transformation(ringIndex)(position)
-          val newPosition = (if (clockwise) {
-                               val p = position - offset
-                               if (p < 0) ringLength + p else p
-                             } else position + offset) % ringLength
-          val (r2, c2) = transformation(ringIndex)(newPosition)
-          result(r2)(c2) = matrix(r1)(c1)
+      if (steps == 0) matrix
+      else {
+        val result = if (mutate) matrix else Array.ofDim[Int](rows, cols)
+        // rotate matrix
+        for (ringIndex <- 0 until numberOfRings) {
+          val ringLength = rings(ringIndex).length
+          val offset = Math.abs(steps) % ringLength
+          val ring = if (steps < 0) rings(ringIndex).reverse else rings(ringIndex)
+          val cache = Array.ofDim[Int](Math.abs(offset))
+          for (i <- 0 until offset) {
+            val (r, c) = ring(i)
+            cache(i) = matrix(r)(c)
+          }
+          for (i <- offset until ringLength) {
+            val (r1, c1) = ring(i)
+            val (r2, c2) = ring(i - Math.abs(offset))
+            result(r2)(c2) = matrix(r1)(c1)
+          }
+          for (i <- 0 until offset) {
+            val (r2, c2) = ring(ringLength - offset + i)
+            result(r2)(c2) = cache(i)
+          }
         }
+        result
       }
-      result
     }
   }
 }
