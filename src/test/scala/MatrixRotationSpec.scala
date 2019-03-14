@@ -266,6 +266,19 @@ class MatrixRotationSpec extends FlatSpec with Matchers {
     m2 should not be theSameInstanceAs(m1)
   }
 
+  "Rotate function" should "not rotate the matrix if steps = 0" in {
+    val rotation = MatrixRotation.Rotate(4, 5)
+    val m1 = matrix("""
+                      | 1  2  3  4  5
+                      | 6  7  8  9 10
+                      |11 12 13 14 15
+                      |16 17 18 19 20
+                    """.stripMargin)
+    val m2 = rotation(0)(m1)
+    m2 shouldBe m1
+    m2 shouldBe theSameInstanceAs(m1)
+  }
+
   "Rotate function" should "rotate the matrix clockwise in place (mutate)" in {
     val rotation = MatrixRotation.Rotate(4, 5)
     val m1 = matrix("""
